@@ -1,0 +1,72 @@
+bash
+// ansible-playbook -i hosts.ini docker_install.yml
+
+host.ini
+
+ini
+
+[dockerhosts]
+
+192.168.1.1 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+
+docaker_install.yml
+
+---
+- name: Install Docker on Ubuntu
+  hosts: dockerhosts
+  become: yes  # Run as root user
+
+  tasks:
+    - name: Update APT package index
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update APT again after adding Docker repo
+      apt:
+        update_cache: yes
+
+    - name: Install Docker CE
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+
+
+What this Playbook does:
+Updates APT cache.
+
+Installs prerequisites (curl, ca-certificates, etc.).
+
+Adds Docker’s official GPG key and repository.
+
+Installs Docker CE (Community Edition).
+
+Ensures Docker service is running and enabled at boot.
