@@ -1,0 +1,35 @@
+Kubernetes Flow (How it Works)
+Developer writes Deployment YAML describing app requirements.
+
+kubectl apply -f deployment.yaml sends this to API Server.
+
+Scheduler selects the best node for the Pod.
+
+Kubelet pulls container image, starts Pod on node.
+
+Kube-Proxy manages network traffic so Pod can communicate.
+
+Controller Manager ensures the desired number of Pods is running.
+
+// bash :- kubectl apply -f nginx-deployment.yaml
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
